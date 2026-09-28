@@ -17,13 +17,13 @@ class MazeGenerator:
             perfect: bool = False,
             seed: Optional[int] = None,
             ) -> None:
-        """Initialize de maze configuration parameters.
+        """Initialize the maze configuration parameters.
         Args:
             width: Maze width in number of cells.
             height: Maze height in number of cells.
             entry: Entry coordinates as (x, y).
             exit_coords: Exit coordinates as (x, y).
-            perfect: If true, generates a single unique path. Defauts to False.
+            perfect: If true, generates a single unique path. Defaults to False.
             seed: Optional random seed for reproducibilty.
         """
         self.width: int = width
@@ -44,12 +44,12 @@ class MazeGenerator:
     def get_cell(self, x: int, y: int) -> int:
         """Get the wall bitmask value of a specific cell at (x, y)
         Args:
-        x: Column index.
-        y: Row index.
+            x: Column index.
+            y: Row index.
 
         Returns:
-        An integer representing closed walls (0-15).
-            """
+            An integer representing closed walls (0-15).
+        """
         return self.grid[y][x]
 
     def display_grid_console(self) -> None:
@@ -58,7 +58,7 @@ class MazeGenerator:
             print(row)
 
     def generate(self) -> None:
-        """Generate de maze cells and wall structures"""
+        """Generate the maze cells and wall structures"""
         # TODO Implementar algoritimo de gerar o labirinto
         pass
 
