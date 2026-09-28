@@ -12,9 +12,10 @@ class MazeConfig:
     height: int
     entry: tuple[int, int]
     exit: tuple[int, int]
+    perfect: bool
 
 
-REQUIRED_KEYS = {"WIDTH", "HEIGHT", "ENTRY", "EXIT"}
+REQUIRED_KEYS = {"WIDTH", "HEIGHT", "ENTRY", "EXIT", "PERFECT"}
 
 
 def _read_raw_lines(path: Path) -> dict[str, str]:
@@ -42,6 +43,16 @@ def _parse_coordinates(value: str, field_name: str) -> tuple[int, int]:
     except ValueError as exc:
         raise ConfigError(f"Invalid coordinates "
                           f"for {field_name}: '{value}'") from exc
+
+
+def _parse_perfection(value: str)-> bool:
+    if value.strip().lower() in ["yes", "1", "true"]:
+        return True
+    elif value.strip().lower() in ["no", "0", "false"]:
+        return False
+    else:
+        raise ConfigError(f"{value} is a invalid format")
+
 
 def parse_config(path: str) -> MazeConfig:
 
@@ -73,8 +84,11 @@ def parse_config(path: str) -> MazeConfig:
     if entry == exit:
         raise ConfigError("Coordinates 'entry' and 'exit' can't be equals")
 
+    perfect = _parse_perfection(read_lines["PERFECT"])
+
     return MazeConfig(
         width=width,
         height=height,
         entry=entry,
-        exit=exit)
+        exit=exit,
+        perfect=perfect)
