@@ -39,7 +39,7 @@ class MazeGenerator:
             row: List[int] = []
             for x in range(self.width):
                 row.append(15)
-            self.grid.append(row)    
+            self.grid.append(row)   
 
     def get_cell(self, x: int, y: int) -> int:
         """Get the wall bitmask value of a specific cell at (x, y)
@@ -64,7 +64,7 @@ class MazeGenerator:
                 y: Row index.
                 direction: Wall constant (NORTH, EAST, SOUTH, WEST).
         """
-        self.grid[x][y] = self.grid[y][x] & (~direction)
+        self.grid[x][y] = self.grid[x][y] & (~direction)
 
     def remove_wall_between(self, x1: int, y1: int, x2: int, y2: int) -> None:
         """Remove shared walls between two adjacent cells (x1, y1) and (x2, y2).
