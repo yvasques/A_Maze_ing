@@ -12,10 +12,11 @@ class MazeConfig:
     height: int
     entry: tuple[int, int]
     exit: tuple[int, int]
+    output_file: str
     perfect: bool
 
 
-REQUIRED_KEYS = {"WIDTH", "HEIGHT", "ENTRY", "EXIT", "PERFECT"}
+REQUIRED_KEYS = {"WIDTH", "HEIGHT", "ENTRY", "EXIT", "PERFECT", "OUTPUT_FILE"}
 
 
 def _read_raw_lines(path: Path) -> dict[str, str]:
@@ -46,12 +47,12 @@ def _parse_coordinates(value: str, field_name: str) -> tuple[int, int]:
 
 
 def _parse_perfection(value: str)-> bool:
-    if value.strip().lower() in ["yes", "1", "true"]:
+    if value.strip().lower() in ("yes", "1", "true"):
         return True
-    elif value.strip().lower() in ["no", "0", "false"]:
+    elif value.strip().lower() in ("no", "0", "false"):
         return False
     else:
-        raise ConfigError(f"{value} is a invalid format")
+        raise ConfigError(f"{value} is a invalid format for boolean")
 
 
 def parse_config(path: str) -> MazeConfig:
@@ -86,9 +87,12 @@ def parse_config(path: str) -> MazeConfig:
 
     perfect = _parse_perfection(read_lines["PERFECT"])
 
+    output_file = str(read_lines["OUTPUT_FILE"])
+
     return MazeConfig(
         width=width,
         height=height,
         entry=entry,
         exit=exit,
-        perfect=perfect)
+        perfect=perfect,
+        output_file=output_file)
