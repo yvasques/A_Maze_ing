@@ -58,7 +58,8 @@ class MazeGenerator:
             print(row)
 
     def remove_wall(self, x: int, y: int, direction: int) -> None:
-        """Remove a specific wall from a cell at (x, y) using bitwise operations.
+        """
+        Remove a specific wall from a cell at (x, y) using bitwise operations.
             Args:
                 x: Column index.
                 y: Row index.
@@ -67,7 +68,8 @@ class MazeGenerator:
         self.grid[x][y] = self.grid[x][y] & (~direction)
 
     def remove_wall_between(self, x1: int, y1: int, x2: int, y2: int) -> None:
-        """Remove shared walls between two adjacent cells (x1, y1) and (x2, y2).
+        """
+        Remove shared walls between two adjacent cells (x1, y1) and (x2, y2).
             Args:
                 x1: Column of first cell.
                 y1: Row of first cell.
@@ -128,3 +130,16 @@ if __name__ == "__main__":
     generator.remove_wall_between(0, 0, 1, 0)
     print("\nGrid após abrir parede entre (0,0) e (1,0):")
     generator.display_grid_console()
+
+    print("\nTestando get_neighbors")
+    # Teste (0, 0)
+    vizinhos = generator.get_neighbors(0, 0)
+    print(f" -> {vizinhos}")
+
+    # Teste no Centro (2, 2)
+    vizinhos = generator.get_neighbors(2, 2)
+    print(f" -> {vizinhos}")
+
+    # Teste (4, 4)
+    vizinhos = generator.get_neighbors(4, 4)
+    print(f" -> {vizinhos}")
