@@ -14,6 +14,7 @@ class MazeConfig:
     exit: tuple[int, int]
     output_file: str
     perfect: bool
+    seed: int | None = None
 
 
 REQUIRED_KEYS = {"WIDTH", "HEIGHT", "ENTRY", "EXIT", "PERFECT", "OUTPUT_FILE"}
@@ -29,6 +30,10 @@ def _read_raw_lines(path: Path) -> dict[str, str]:
                 stripped = line.strip()
                 if not stripped or stripped.startswith("#"):
                     continue
+
+                if '=' not in stripped:
+                    raise ConfigError(f"Invalid syntax at line {line}")
+
                 key, value = stripped.split("=", 1)
                 raw_dict[key.strip()] = value.strip()
     except FileNotFoundError as exc:
@@ -38,6 +43,8 @@ def _read_raw_lines(path: Path) -> dict[str, str]:
 
 
 def _parse_coordinates(value: str, field_name: str) -> tuple[int, int]:
+    """Read the config file and return a tuple of coordinates"""
+
     try:
         x_value, y_value = value.split(",")
         return int(x_value), int(y_value)
@@ -47,12 +54,23 @@ def _parse_coordinates(value: str, field_name: str) -> tuple[int, int]:
 
 
 def _parse_perfection(value: str)-> bool:
+    """Read the config file and return a tuple of coordinates"""
+
     if value.strip().lower() in ("yes", "1", "true"):
         return True
     elif value.strip().lower() in ("no", "0", "false"):
         return False
     else:
         raise ConfigError(f"{value} is a invalid format for boolean")
+
+
+def _perse_seed(value: str) -> int:
+    seed: int
+    try:
+        seed = int(value)
+    except ValueError as exc:
+        raise ConfigError("Seed must be a integer")
+    return seed
 
 
 def parse_config(path: str) -> MazeConfig:
@@ -83,11 +101,18 @@ def parse_config(path: str) -> MazeConfig:
             raise ConfigError(f"{name} {x, y} are out of bounds")
 
     if entry == exit:
-        raise ConfigError("Coordinates 'entry' and 'exit' can't be equals")
+        raise ConfigError("Coordinates 'entry' and 'exit' must be different")
 
     perfect = _parse_perfection(read_lines["PERFECT"])
 
     output_file = str(read_lines["OUTPUT_FILE"])
+
+    if not "SEED" in read_lines:
+        seed = None
+    else:
+        seed = _perse_seed(read_lines["SEED"])
+
+
 
     return MazeConfig(
         width=width,
@@ -95,4 +120,5 @@ def parse_config(path: str) -> MazeConfig:
         entry=entry,
         exit=exit,
         perfect=perfect,
-        output_file=output_file)
+        output_file=output_file,
+        seed=seed)
