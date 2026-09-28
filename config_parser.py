@@ -53,7 +53,7 @@ def _parse_coordinates(value: str, field_name: str) -> tuple[int, int]:
                           f"for {field_name}: '{value}'") from exc
 
 
-def _parse_perfection(value: str)-> bool:
+def _parse_perfection(value: str) -> bool:
     """Read the config file and return a tuple of coordinates"""
 
     if value.strip().lower() in ("yes", "1", "true"):
@@ -65,15 +65,25 @@ def _parse_perfection(value: str)-> bool:
 
 
 def _perse_seed(value: str) -> int:
+    """Read the config file and return a int value"""
+
     seed: int
     try:
         seed = int(value)
     except ValueError as exc:
-        raise ConfigError("Seed must be a integer")
+        raise ConfigError("Seed must be a integer") from exc
     return seed
 
 
 def parse_config(path: str) -> MazeConfig:
+    """Parse and validate a maze configuration file.
+    Args:
+        path: Path to the configuration file.
+    Returns:
+        A validated MazeConfig instance.
+    Raises:
+        ConfigError: If the file is missing, malformed, or logically invalid.
+    """
 
     config_path = Path(path)
     read_lines = _read_raw_lines(config_path)
@@ -91,7 +101,7 @@ def parse_config(path: str) -> MazeConfig:
 
     if width <= 0 or height <= 0:
         raise ConfigError("WIDTH and HEIGHT must be positive integers "
-                          f"and greater than zero.")
+                          "and greater than zero.")
 
     entry = _parse_coordinates(read_lines["ENTRY"], "ENTRY")
     exit = _parse_coordinates(read_lines["EXIT"], "EXIT")
@@ -107,12 +117,10 @@ def parse_config(path: str) -> MazeConfig:
 
     output_file = str(read_lines["OUTPUT_FILE"])
 
-    if not "SEED" in read_lines:
+    if "SEED" not in read_lines:
         seed = None
     else:
         seed = _perse_seed(read_lines["SEED"])
-
-
 
     return MazeConfig(
         width=width,
