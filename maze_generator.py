@@ -39,7 +39,7 @@ class MazeGenerator:
             row: List[int] = []
             for x in range(self.width):
                 row.append(15)
-            self.grid.append(row)   
+            self.grid.append(row)
 
     def get_cell(self, x: int, y: int) -> int:
         """Get the wall bitmask value of a specific cell at (x, y)
