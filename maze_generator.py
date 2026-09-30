@@ -111,6 +111,23 @@ class MazeGenerator:
         return neighbors
 
 
+    def entry_exit(self, x: int, y: int):
+        if (x, y) == self.entry:
+            return " E "
+        elif (x, y) == self.exit_coords:
+            return " S "
+        return "   "
+
+    def open_entry_exit(self, x: int, y: int) -> None:
+        if y == 0:
+            self.remove_wall(x,y, NORTH)
+        elif y == self.height - 1:
+            self.remove_wall(x,y, SOUTH)
+        elif x == 0:
+            self.remove_wall(x,y, WEST)
+        elif x == self.width - 1:
+            self.remove_wall(x,y, EAST)
+
     def generate(self) -> None:
         """Generate the maze cells and wall structures"""
         if self.seed:
@@ -136,6 +153,8 @@ class MazeGenerator:
             else:
                 stack.pop()
 
+        self.open_entry_exit(*self.entry)
+        self.open_entry_exit(*self.exit_coords)
 
     def get_shortest_path(self) -> str:
         """Find and return the shortest path between entry and exit
