@@ -1,5 +1,6 @@
 """Module responsible for maze generation and manipulation."""
 from typing import List, Tuple, Optional
+import random
 
 NORTH: int = 1
 EAST: int = 2
@@ -52,10 +53,6 @@ class MazeGenerator:
         """
         return self.grid[y][x]
 
-    def display_grid_console(self) -> None:
-        """Printando a matriz para teste"""
-        for row in self.grid:
-            print(row)
 
     def remove_wall(self, x: int, y: int, direction: int) -> None:
         """
@@ -65,7 +62,7 @@ class MazeGenerator:
                 y: Row index.
                 direction: Wall constant (NORTH, EAST, SOUTH, WEST).
         """
-        self.grid[x][y] = self.grid[x][y] & (~direction)
+        self.grid[y][x] = self.grid[y][x] & (~direction)
 
     def remove_wall_between(self, x1: int, y1: int, x2: int, y2: int) -> None:
         """
@@ -112,8 +109,26 @@ class MazeGenerator:
 
     def generate(self) -> None:
         """Generate the maze cells and wall structures"""
-        # TODO Implementar algoritimo de gerar o labirinto
-        pass
+
+        visited = [[False] * self.width for _ in range(self.height)]
+
+        start_x, start_y = self.entry
+        visited[start_x][start_y] = True
+
+        stack = [(start_x, start_y)]
+
+        while stack:
+            x, y = stack[-1]
+            unvisted = [(un_x, un_y) for un_x, un_y in self.get_neighbors(x, y)
+                        if not visited[un_y][un_x]]
+
+            if unvisted:
+                un_x, un_y = random.choice(unvisted)
+                self.remove_wall_between(x, y, un_x, un_y)
+                visited[un_y][un_x] = True
+                stack.append((un_x, un_y))
+            else:
+                stack.pop()
 
     def get_shortest_path(self) -> str:
         """Find and return the shortest path between entry and exit
@@ -123,23 +138,40 @@ class MazeGenerator:
         return ""
 
 
+    def display_grid_console(self) -> None:
+        """Printando a matriz para teste"""
+        for row in self.grid:
+            print(row)
+
+    def display_asc_format(self) -> None:
+        """Print the maze as ASCII art based on each cell's wall bitmask."""
+
+        for y in range(self.height):
+            top: str = "+"
+            middle: str = ""
+
+            for x in range(self.width):
+                cell: int = self.grid[y][x]
+
+                top += ("---" if cell & NORTH else  "   ") + '+'
+                middle += ("|" if cell & WEST else " ") + "   "
+
+            last_cell: int = self.grid[y][self.width - 1]
+            middle += "|" if last_cell & EAST else " "
+
+            print(top)
+            print(middle)
+
+        bottom: str = "+"
+        for x in range(self.width):
+            cell: int = self.grid[self.height - 1][x]
+            bottom += ("---" if cell & SOUTH else "   ") + "+"
+        print(bottom)
+
+
 if __name__ == "__main__":
-    generator = MazeGenerator(width=5, height=5)
-    print("Grid inicial (tudo fechado = 15):")
+    generator = MazeGenerator(width=3, height=3)
+    generator.generate()
     generator.display_grid_console()
-    generator.remove_wall_between(0, 0, 1, 0)
-    print("\nGrid após abrir parede entre (0,0) e (1,0):")
-    generator.display_grid_console()
-
-    print("\nTestando get_neighbors")
-    # Teste (0, 0)
-    vizinhos = generator.get_neighbors(0, 0)
-    print(f" -> {vizinhos}")
-
-    # Teste no Centro (2, 2)
-    vizinhos = generator.get_neighbors(2, 2)
-    print(f" -> {vizinhos}")
-
-    # Teste (4, 4)
-    vizinhos = generator.get_neighbors(4, 4)
-    print(f" -> {vizinhos}")
+    print()
+    generator.display_asc_format()
