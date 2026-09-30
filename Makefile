@@ -13,13 +13,13 @@ install:
 	$(PIP) install flake8 mypy
 
 run:
-	$(PYTHON) $(ENTRY_POINT) $(CONFIG_FILE)
+	$(PYTHON_VENV) $(ENTRY_POINT) $(CONFIG_FILE)
 
 debug:
-	$(PYTHON) -m pdb $(ENTRY_POINT) $(CONFIG_FILE)
+	$(PYTHON_VENV) -m pdb $(ENTRY_POINT) $(CONFIG_FILE)
 
 clean:
-	rm -rf __pycache__ .mypy_cache .pytest_cache build dist *.egg-info
+	rm -rf __pycache__ .mypy_cache .pytest_cache build dist *.egg-info $(VENV)
 
 lint:
 	$(PYTHON_VENV) -m flake8 --exclude=$(VENV) .
@@ -31,5 +31,5 @@ lint:
 		--check-untyped-defs
 
 lint-strict:
-	flake8 --exclude=$(VENV) .
-	mypy --strict --exclude '^$(VENV)/' .
+	$(PYTHON_VENV) -m flake8 --exclude=$(VENV) .
+	$(PYTHON_VENV) -m mypy --strict --exclude $(VENV) .
