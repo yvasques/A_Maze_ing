@@ -42,6 +42,7 @@ class MazeGenerator:
                 row.append(15)
             self.grid.append(row)
 
+
     def get_cell(self, x: int, y: int) -> int:
         """Get the wall bitmask value of a specific cell at (x, y)
         Args:
@@ -63,6 +64,7 @@ class MazeGenerator:
                 direction: Wall constant (NORTH, EAST, SOUTH, WEST).
         """
         self.grid[y][x] = self.grid[y][x] & (~direction)
+
 
     def remove_wall_between(self, x1: int, y1: int, x2: int, y2: int) -> None:
         """
@@ -89,6 +91,7 @@ class MazeGenerator:
             self.remove_wall(x1, y1, NORTH)
             self.remove_wall(x2, y2, SOUTH)
 
+
     def get_neighbors(self, x: int, y: int) -> List[Tuple[int, int]]:
         """Get coordinates of valid adjacent cells within maze boundaries.
             Args:
@@ -107,8 +110,11 @@ class MazeGenerator:
                 neighbors.append((new_x, new_y))
         return neighbors
 
+
     def generate(self) -> None:
         """Generate the maze cells and wall structures"""
+        if self.seed:
+            random.seed(self.seed)
 
         visited = [[False] * self.width for _ in range(self.height)]
 
@@ -130,48 +136,10 @@ class MazeGenerator:
             else:
                 stack.pop()
 
+
     def get_shortest_path(self) -> str:
         """Find and return the shortest path between entry and exit
         Returns a string representing the directions steps (Example:"NSEW")
         """
         # TODO Implementar algoritmo de achar o menor caminho
         return ""
-
-
-    def display_grid_console(self) -> None:
-        """Printando a matriz para teste"""
-        for row in self.grid:
-            print(row)
-
-    def display_asc_format(self) -> None:
-        """Print the maze as ASCII art based on each cell's wall bitmask."""
-
-        for y in range(self.height):
-            top: str = "+"
-            middle: str = ""
-
-            for x in range(self.width):
-                cell: int = self.grid[y][x]
-
-                top += ("---" if cell & NORTH else  "   ") + '+'
-                middle += ("|" if cell & WEST else " ") + "   "
-
-            last_cell: int = self.grid[y][self.width - 1]
-            middle += "|" if last_cell & EAST else " "
-
-            print(top)
-            print(middle)
-
-        bottom: str = "+"
-        for x in range(self.width):
-            cell: int = self.grid[self.height - 1][x]
-            bottom += ("---" if cell & SOUTH else "   ") + "+"
-        print(bottom)
-
-
-if __name__ == "__main__":
-    generator = MazeGenerator(width=3, height=3)
-    generator.generate()
-    generator.display_grid_console()
-    print()
-    generator.display_asc_format()
