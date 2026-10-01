@@ -21,8 +21,9 @@ def write_maze_file(
     """
     with open(filepath, "w", encoding="utf=8") as file:
         for row in grid:
-            # Conversão para hexa
-            hex_row = "".join(f"{cell:X}" for cell in row)
+            hex_row = ""
+            for cell in row:
+                hex_row += f"{cell:X}"
             file.write(f"{hex_row}\n")
         file.write("\n")
 
