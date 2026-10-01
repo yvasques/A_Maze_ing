@@ -1,4 +1,5 @@
-from maze_generator import *
+from maze_generator import (MazeGenerator,
+                            NORTH, WEST, EAST, SOUTH)
 
 
 def display_asc_format(maze: MazeGenerator) -> None:
@@ -28,6 +29,10 @@ def display_asc_format(maze: MazeGenerator) -> None:
 
 
 if __name__ == "__main__":
-    generator = MazeGenerator(width=8, height=5, entry=(0,0), exit_coords=(4,4))
+    generator = MazeGenerator(width=5, height=5,
+                              entry=(0,0), exit_coords=(4,4))
+
     generator.generate()
     display_asc_format(generator)
+    print()
+    print(generator.get_shortest_path())
