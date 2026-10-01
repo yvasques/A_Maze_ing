@@ -1,5 +1,6 @@
 """Module responsible for maze generation and manipulation."""
 from typing import List, Tuple, Optional
+import random
 
 NORTH: int = 1
 EAST: int = 2
@@ -41,6 +42,7 @@ class MazeGenerator:
                 row.append(15)
             self.grid.append(row)
 
+
     def get_cell(self, x: int, y: int) -> int:
         """Get the wall bitmask value of a specific cell at (x, y)
         Args:
@@ -52,10 +54,6 @@ class MazeGenerator:
         """
         return self.grid[y][x]
 
-    def display_grid_console(self) -> None:
-        """Printando a matriz para teste"""
-        for row in self.grid:
-            print(row)
 
     def remove_wall(self, x: int, y: int, direction: int) -> None:
         """
@@ -65,7 +63,8 @@ class MazeGenerator:
                 y: Row index.
                 direction: Wall constant (NORTH, EAST, SOUTH, WEST).
         """
-        self.grid[x][y] = self.grid[x][y] & (~direction)
+        self.grid[y][x] = self.grid[y][x] & (~direction)
+
 
     def remove_wall_between(self, x1: int, y1: int, x2: int, y2: int) -> None:
         """
@@ -92,6 +91,7 @@ class MazeGenerator:
             self.remove_wall(x1, y1, NORTH)
             self.remove_wall(x2, y2, SOUTH)
 
+
     def get_neighbors(self, x: int, y: int) -> List[Tuple[int, int]]:
         """Get coordinates of valid adjacent cells within maze boundaries.
             Args:
@@ -110,10 +110,40 @@ class MazeGenerator:
                 neighbors.append((new_x, new_y))
         return neighbors
 
+
+    def entry_exit(self, x: int, y: int) -> str:
+        if (x, y) == self.entry:
+            return " E "
+        elif (x, y) == self.exit_coords:
+            return " S "
+        return "   "
+
+
     def generate(self) -> None:
         """Generate the maze cells and wall structures"""
-        # TODO Implementar algoritimo de gerar o labirinto
-        pass
+        if self.seed is not None:
+            random.seed(self.seed)
+
+        visited = [[False] * self.width for _ in range(self.height)]
+
+        start_x, start_y = self.entry
+        visited[start_y][start_x] = True
+
+        stack = [(start_x, start_y)]
+
+        while stack:
+            x, y = stack[-1]
+            unvisted = [(un_x, un_y) for un_x, un_y in self.get_neighbors(x, y)
+                        if not visited[un_y][un_x]]
+
+            if unvisted:
+                un_x, un_y = random.choice(unvisted)
+                self.remove_wall_between(x, y, un_x, un_y)
+                visited[un_y][un_x] = True
+                stack.append((un_x, un_y))
+            else:
+                stack.pop()
+
 
     def get_shortest_path(self) -> str:
         """Find and return the shortest path between entry and exit
@@ -121,25 +151,3 @@ class MazeGenerator:
         """
         # TODO Implementar algoritmo de achar o menor caminho
         return ""
-
-
-if __name__ == "__main__":
-    generator = MazeGenerator(width=5, height=5)
-    print("Grid inicial (tudo fechado = 15):")
-    generator.display_grid_console()
-    generator.remove_wall_between(0, 0, 1, 0)
-    print("\nGrid após abrir parede entre (0,0) e (1,0):")
-    generator.display_grid_console()
-
-    print("\nTestando get_neighbors")
-    # Teste (0, 0)
-    vizinhos = generator.get_neighbors(0, 0)
-    print(f" -> {vizinhos}")
-
-    # Teste no Centro (2, 2)
-    vizinhos = generator.get_neighbors(2, 2)
-    print(f" -> {vizinhos}")
-
-    # Teste (4, 4)
-    vizinhos = generator.get_neighbors(4, 4)
-    print(f" -> {vizinhos}")
