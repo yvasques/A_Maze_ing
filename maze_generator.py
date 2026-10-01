@@ -1,5 +1,7 @@
 """Module responsible for maze generation and manipulation."""
-from typing import List, Tuple, Optional
+
+from collections import deque
+from typing import List, Tuple, Optional, Deque
 import random
 
 NORTH: int = 1
@@ -113,14 +115,14 @@ class MazeGenerator:
 
     def entry_exit(self, x: int, y: int) -> str:
         if (x, y) == self.entry:
-            return " E "
+            return " e "
         elif (x, y) == self.exit_coords:
-            return " S "
+            return " s "
         return "   "
 
 
     def generate(self) -> None:
-        """Generate the maze cells and wall structures"""
+        """Generate the maze cells and wall structures using DFS"""
         if self.seed is not None:
             random.seed(self.seed)
 
@@ -145,9 +147,41 @@ class MazeGenerator:
                 stack.pop()
 
 
-    def get_shortest_path(self) -> str:
-        """Find and return the shortest path between entry and exit
-        Returns a string representing the directions steps (Example:"NSEW")
-        """
-        # TODO Implementar algoritmo de achar o menor caminho
+    def get_shortest_path(self) -> str :
+        """Find the shortest path between entry and exit using BFS.
+    Returns:
+        A string of moves using N, E, S, W (example: "ESSENE").
+        Empty string if there is no path.
+    """
+
+        start_x, start_y = self.entry
+
+        queue: Deque[Tuple[int, int, str]] = deque([(start_x, start_y, "")])
+        visted = {self.entry}
+
+        directions = [(NORTH, 0, -1, "N"),
+                    (SOUTH, 0, 1, "S"),
+                    (EAST, 1, 0, "E"),
+                    (WEST, -1, 0, "W"),
+                     ]
+
+        while queue:
+            x, y, path = queue.popleft()
+
+            if (x, y) == self.exit_coords:
+                return path
+
+            for wall, dx, dy, letter in directions:
+                nx, ny = dx + x, dy + y,
+
+                if (nx, ny) in visted:
+                    continue
+                elif not (0 <= nx < self.width and 0 <= ny < self.height):
+                    continue
+                elif self.grid[y][x] & wall:
+                        continue
+
+                visted.add((nx, ny))
+                queue.append((nx, ny, path + letter))
+
         return ""
