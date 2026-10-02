@@ -3,13 +3,13 @@ from config_parser import parse_config, ConfigError
 from maze_generator import MazeGenerator
 from maze_solver import MazeSolver
 from output import write_maze_file
+from display import display_asc_format
 
 
 def main() -> None:
     """Run the main maze generation flow"""
     config_path = next((
-        arg for arg in sys.argv if arg == "config.txt" or
-        arg.endswith("/config.txt")))
+        arg for arg in sys.argv if arg.endswith(".txt")))
     if config_path is None:
         print("Usage: python3 a_maze_ing.py <config_file>")
         sys.exit(1)
@@ -47,6 +47,7 @@ def main() -> None:
     )
     print("Maze sucessfully generated and written to "
           f"{config.output_file}")
+    display_asc_format(generator)
 
 
 if __name__ == "__main__":
