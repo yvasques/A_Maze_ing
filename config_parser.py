@@ -1,3 +1,4 @@
+from typing import Tuple, Dict
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -10,8 +11,8 @@ class ConfigError(Exception):
 class MazeConfig:
     width: int
     height: int
-    entry: tuple[int, int]
-    exit: tuple[int, int]
+    entry: Tuple[int, int]
+    exit: Tuple[int, int]
     output_file: str
     perfect: bool
     seed: int | None = None
@@ -20,10 +21,10 @@ class MazeConfig:
 REQUIRED_KEYS = {"WIDTH", "HEIGHT", "ENTRY", "EXIT", "PERFECT", "OUTPUT_FILE"}
 
 
-def _read_raw_lines(path: Path) -> dict[str, str]:
+def _read_raw_lines(path: Path) -> Dict[str, str]:
     """Read the config file and return raw key/value pairs as strings."""
 
-    raw_dict: dict[str, str] = {}
+    raw_dict: Dict[str, str] = {}
     try:
         with path.open('r', encoding='utf-8') as file:
             for line_number, line in enumerate(file, start=1):
@@ -42,8 +43,8 @@ def _read_raw_lines(path: Path) -> dict[str, str]:
     return raw_dict
 
 
-def _parse_coordinates(value: str, field_name: str) -> tuple[int, int]:
-    """Read the config file and return a tuple of coordinates"""
+def _parse_coordinates(value: str, field_name: str) -> Tuple[int, int]:
+    """Read the config file and return a Tuple of coordinates"""
 
     try:
         x_value, y_value = value.split(",")
@@ -54,7 +55,7 @@ def _parse_coordinates(value: str, field_name: str) -> tuple[int, int]:
 
 
 def _parse_perfection(value: str) -> bool:
-    """Read the config file and return a tuple of coordinates"""
+    """Read the config file and return a Tuple of coordinates"""
 
     if value.strip().lower() in ("yes", "1", "true"):
         return True
