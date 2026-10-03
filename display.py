@@ -2,30 +2,38 @@ from maze_generator import (MazeGenerator,
                             NORTH, WEST, EAST, SOUTH)
 
 
+def _cell_label(maze: MazeGenerator, x: int, y: int) -> str:
+        if (x, y) == maze.entry:
+            return " E "
+        elif (x, y) == maze.exit_coords:
+            return " S "
+        return "   "
+
+
+def _horizontal_line(maze: MazeGenerator, y:int, wall: int) -> str:
+    line: str = "+"
+    for x in range(maze.width):
+        has_wall: bool = bool(maze.get_cell(x, y) & wall)
+        line += ("---" if has_wall else "   ") + "+"
+    return line
+
+def _middle_line(maze: MazeGenerator, y: int):
+    line: str = ""
+    for x in range(maze.width):
+        has_west: bool = bool(maze.get_cell(x, y) & WEST)
+        line += ("|" if has_west else " ") + _cell_label(maze, x, y)
+
+    has_east: bool = bool(maze.get_cell(maze.width-1, y) & EAST)
+    line += ("|" if has_east else " ")
+
+    return line
+
 def display_asc_format(maze: MazeGenerator) -> None:
-        """Print the maze as ASCII art based on each cell's wall bitmask."""
+    for y in range(maze.height):
+        print(_horizontal_line(maze, y, NORTH))
+        print(_middle_line(maze, y))
+    print(_horizontal_line(maze, maze.height-1, SOUTH))
 
-        for y in range(maze.height):
-            top: str = "+"
-            middle: str = ""
-
-            for x in range(maze.width):
-                cell: int = maze.grid[y][x]
-
-                top += ("---" if cell & NORTH else  "   ") + '+'
-                middle += ("|" if cell & WEST else " ") + maze.entry_exit(x, y)
-
-            last_cell: int = maze.grid[y][maze.width - 1]
-            middle += "|" if last_cell & EAST else " "
-
-            print(top)
-            print(middle)
-
-        bottom: str = "+"
-        for x in range(maze.width):
-            bottom_cell: int = maze.grid[maze.height - 1][x]
-            bottom += ("---" if bottom_cell & SOUTH else "   ") + "+"
-        print(bottom)
 
 
 if __name__ == "__main__":
@@ -33,6 +41,3 @@ if __name__ == "__main__":
                               entry=(0,0), exit_coords=(4,4))
 
     generator.generate()
-    display_asc_format(generator)
-    print()
-    print(generator.get_shortest_path())
