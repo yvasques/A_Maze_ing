@@ -108,6 +108,8 @@ def parse_config(path: str) -> MazeConfig:
     exit = _parse_coordinates(read_lines["EXIT"], "EXIT")
 
     for name, (x, y) in (("ENTRY", entry), ("EXIT", exit)):
+        if (x < 0 or y < 0):
+            raise ConfigError(f"{name} {x, y} must be greater than zero.")
         if not (0 <= x < width and 0 <= y < height):
             raise ConfigError(f"{name} {x, y} are out of bounds")
 
