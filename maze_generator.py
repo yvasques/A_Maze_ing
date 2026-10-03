@@ -113,14 +113,6 @@ class MazeGenerator:
         return neighbors
 
 
-    def entry_exit(self, x: int, y: int) -> str:
-        if (x, y) == self.entry:
-            return " e "
-        elif (x, y) == self.exit_coords:
-            return " s "
-        return "   "
-
-
     def generate(self) -> None:
         """Generate the maze cells and wall structures using DFS"""
         if self.seed is not None:
