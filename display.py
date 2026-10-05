@@ -10,6 +10,11 @@ CELL_SIZE: int = 32
 WALL_SIZE: int = 3
 MARGIN: int = 20
 
+KEY_4: int = 52
+
+MENU_TEXT: str = "1: regen   2: path   3: color   4: quit"
+
+
 class MazeWindow:
     """Window that draws a maze using the MiniLibX library."""
 
@@ -25,7 +30,7 @@ class MazeWindow:
         self.win_ptr: Any = self.mlx.mlx_new_window(
             self.mlx_ptr,
             maze.width * CELL_SIZE + 2 * MARGIN,
-            maze.height * CELL_SIZE + 2 * MARGIN,
+            maze.height * CELL_SIZE + 2 * MARGIN + 30,
             "A_Maze_ing"
         ) #open window
 
@@ -75,13 +80,36 @@ class MazeWindow:
             px, py = self._origin(east_x, y)
             self._draw_rect(px + CELL_SIZE, py, WALL_SIZE, CELL_SIZE + WALL_SIZE)
 
+
+    def _draw_menu(self):
+        """Write the menu text below the maze."""
+        menu_y: int = self.maze.height * CELL_SIZE + 2 * MARGIN
+
+        self.mlx.mlx_string_put(self.mlx_ptr, self.win_ptr, MARGIN,
+                                menu_y, GREEN, MENU_TEXT)
+
+
+    def _on_key(self, keycode: int, param: Any) -> None:
+        if keycode == KEY_4:
+            self._close_window(Any)
+            return
+        self.draw()
+
+
+    def _close_window(self,param: Any):
+        """Stop the event loop when the window is closed."""
+        self.mlx.mlx_loop_exit(self.mlx_ptr)
+
+
     def draw(self) -> None:
-        """Draw the whole maze based on each cell's wall bitmask."""
-        for y in range(self.maze.height):
-            self._horizontal_walls(y, NORTH)
-            self._middle_line(y)
-        self._horizontal_walls(self.maze.height -1, SOUTH)
+            """Draw the whole maze based on each cell's wall bitmask."""
+            for y in range(self.maze.height):
+                self._horizontal_walls(y, NORTH)
+                self._middle_line(y)
+            self._horizontal_walls(self.maze.height -1, SOUTH)
+            self._draw_menu()
 
     def run(self) -> None:
         self.draw()
+        self.mlx.mlx_key_hook(self.win_ptr, self._on_key, None)
         self.mlx.mlx_loop(self.mlx_ptr)
