@@ -3,7 +3,7 @@ from config_parser import parse_config, ConfigError
 from maze_generator import MazeGenerator
 from maze_solver import MazeSolver
 from output import write_maze_file
-from display import display_asc_format
+from display import MazeWindow
 
 
 def main() -> None:
@@ -47,8 +47,8 @@ def main() -> None:
     )
     print("Maze sucessfully generated and written to "
           f"{config.output_file}")
-    display_asc_format(generator)
 
+    MazeWindow(generator).run()
 
 if __name__ == "__main__":
     main()
