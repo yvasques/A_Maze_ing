@@ -65,6 +65,10 @@ class MazeWindow:
                 px, py = self._origin(x, y)
                 self._draw_rect(px, py, WALL_SIZE, CELL_SIZE + WALL_SIZE)
 
+            label: str = self._cell_label(x, y)
+            if label:
+                self.mlx.mlx_string_put(self.mlx_ptr,
+                                        self.win_ptr, px, py, WHITE, label)
 
         east_x:int  = self.maze.width - 1
         if self.maze.get_cell(east_x, y) & EAST:
