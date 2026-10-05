@@ -36,7 +36,6 @@ class MazeWindow:
 
     def _draw_rect(self, x: int, y: int, w: int, h: int) -> None:
         """Fill a rectangle of pixels with the wall color."""
-        self.mlx.mlx_clear_window(self.mlx_ptr, self.win_ptr)
         for py in range(y, y + h):
             for px in range(x, x + w):
                 self.mlx.mlx_pixel_put(self.mlx_ptr, self.win_ptr,
