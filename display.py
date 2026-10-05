@@ -1,20 +1,24 @@
 from maze_generator import (MazeGenerator,
                             NORTH, WEST, EAST, SOUTH)
-from mlx import Mlx
-from typing import Any, Tuple
-
 from utils.colors import GREEN, WALL_COLORS
 from utils.keys_menu import MENU_TEXT, KEY_3, KEY_4
+from mlx import Mlx
+from typing import Any, Tuple, Set, Dict
 
 CELL_SIZE: int = 32
 WALL_SIZE: int = 3
 MARGIN: int = 20
 
+MOVES: Dict[str, Tuple[int, int]] = {"N": (0, -1),
+                                     "E": (1, 0),
+                                     "S":(0,1),
+                                     "W":(-1,0)}
+
 
 class MazeWindow:
     """Window that draws a maze using the MiniLibX library."""
 
-    def __init__(self, maze: MazeGenerator) -> None:
+    def __init__(self, maze: MazeGenerator, path) -> None:
         """Create the MLX window sized to fit the maze.
         Args:
             maze: The generated maze to display.
@@ -22,6 +26,7 @@ class MazeWindow:
 
         self.maze: MazeGenerator = maze
         self.color_index: int = 0
+        self.path: str = path
 
         self.mlx: Any = Mlx()
         self.mlx_ptr: Any = self.mlx.mlx_init() #begin mlx
@@ -77,12 +82,32 @@ class MazeWindow:
             label: str = self._cell_label(x, y)
             if label:
                 self.mlx.mlx_string_put(self.mlx_ptr,
-                                        self.win_ptr, px, py, color, label)
+                                        self.win_ptr, px + CELL_SIZE // 2,
+                                        py + CELL_SIZE //2, color, label)
 
         east_x:int  = self.maze.width - 1
         if self.maze.get_cell(east_x, y) & EAST:
             px, py = self._origin(east_x, y)
             self._draw_rect(px + CELL_SIZE, py, WALL_SIZE, CELL_SIZE + WALL_SIZE, color)
+
+
+    def _draw_path_cells(self) -> Set[Tuple[int, int]]:
+        """Convert the path string into the set of cells it crosses."""
+        (x, y) = self.maze.entry
+        cells: Set[Tuple[int, int]] = {(x, y)}
+        for step in self.path:
+            px, py = MOVES[step]
+            x, y,  = px + x, py + y
+            cells.add((x, y))
+        return cells
+
+    def _draw_path(self) -> None:
+        """Draw a small square in the center of each cell of the path."""
+        size: int = CELL_SIZE // 3
+        for (x, y) in self._draw_path_cells():
+            px, py = self._origin(x, y)
+            self._draw_rect(px + (CELL_SIZE - size), py + (CELL_SIZE - size),
+                            size, size, 0xFFFFD700)
 
 
     def _draw_menu(self):
@@ -108,13 +133,16 @@ class MazeWindow:
 
 
     def draw(self) -> None:
-            """Draw the whole maze based on each cell's wall bitmask."""
-            self.mlx.mlx_clear_window(self.mlx_ptr, self.win_ptr)
-            for y in range(self.maze.height):
-                self._horizontal_walls(y, NORTH)
-                self._middle_line(y)
-            self._horizontal_walls(self.maze.height -1, SOUTH)
-            self._draw_menu()
+        """Draw the whole maze based on each cell's wall bitmask."""
+        self.mlx.mlx_clear_window(self.mlx_ptr, self.win_ptr)
+
+        self._draw_path()
+
+        for y in range(self.maze.height):
+            self._horizontal_walls(y, NORTH)
+            self._middle_line(y)
+        self._horizontal_walls(self.maze.height -1, SOUTH)
+        self._draw_menu()
 
 
     def run(self) -> None:
