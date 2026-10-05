@@ -166,7 +166,7 @@ class MazeGenerator:
                                     break
             if dead_ends_found == 0:
                 break
-                
+
     def generate(self) -> None:
         """Generate the maze cells and wall structures using DFS"""
         self._reset_grid()
