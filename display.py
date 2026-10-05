@@ -3,16 +3,12 @@ from maze_generator import (MazeGenerator,
 from mlx import Mlx
 from typing import Any, Tuple
 
-from utils.colors import RED, WHITE, GREEN, BLUE
-
+from utils.colors import GREEN, WALL_COLORS
+from utils.keys_menu import MENU_TEXT, KEY_3, KEY_4
 
 CELL_SIZE: int = 32
 WALL_SIZE: int = 3
 MARGIN: int = 20
-
-KEY_4: int = 52
-
-MENU_TEXT: str = "1: regen   2: path   3: color   4: quit"
 
 
 class MazeWindow:
@@ -25,6 +21,8 @@ class MazeWindow:
         """
 
         self.maze: MazeGenerator = maze
+        self.color_index: int = 0
+
         self.mlx: Any = Mlx()
         self.mlx_ptr: Any = self.mlx.mlx_init() #begin mlx
         self.win_ptr: Any = self.mlx.mlx_new_window(
@@ -39,12 +37,14 @@ class MazeWindow:
         """Return the pixel position of the top-left corner of a cell."""
         return MARGIN + x * CELL_SIZE, MARGIN + y * CELL_SIZE
 
-    def _draw_rect(self, x: int, y: int, w: int, h: int) -> None:
+
+    def _draw_rect(self, x: int, y: int, w: int, h: int, color: int) -> None:
         """Fill a rectangle of pixels with the wall color."""
         for py in range(y, y + h):
             for px in range(x, x + w):
                 self.mlx.mlx_pixel_put(self.mlx_ptr, self.win_ptr,
-                                       px, py, BLUE)
+                                       px, py, color)
+
 
     def _cell_label(self, x: int, y: int) -> str:
         """Return the letter of a cell (entry, exit or empty)."""
@@ -54,31 +54,35 @@ class MazeWindow:
             return "S"
         return ""
 
+
     def _horizontal_walls(self, y: int, wall: int) -> None:
         """Draw the horizontal walls (NORTH or SOUTH) of row y."""
+        color: int = WALL_COLORS[self.color_index]
         offset: int = CELL_SIZE if wall == SOUTH else 0
         for x in range(self.maze.width):
             if self.maze.get_cell(x, y) & wall:
                 px, py = self._origin(x, y)
                 self._draw_rect(px, py + offset,
-                                CELL_SIZE + WALL_SIZE, WALL_SIZE)
+                                CELL_SIZE + WALL_SIZE, WALL_SIZE, color)
+
 
     def _middle_line(self, y: int) -> None:
         """Build the line containing cell labels and vertical walls."""
+        color: int = WALL_COLORS[self.color_index]
         for x in range(self.maze.width):
             if self.maze.get_cell(x, y) & WEST:
                 px, py = self._origin(x, y)
-                self._draw_rect(px, py, WALL_SIZE, CELL_SIZE + WALL_SIZE)
+                self._draw_rect(px, py, WALL_SIZE, CELL_SIZE + WALL_SIZE, color)
 
             label: str = self._cell_label(x, y)
             if label:
                 self.mlx.mlx_string_put(self.mlx_ptr,
-                                        self.win_ptr, px, py, WHITE, label)
+                                        self.win_ptr, px, py, color, label)
 
         east_x:int  = self.maze.width - 1
         if self.maze.get_cell(east_x, y) & EAST:
             px, py = self._origin(east_x, y)
-            self._draw_rect(px + CELL_SIZE, py, WALL_SIZE, CELL_SIZE + WALL_SIZE)
+            self._draw_rect(px + CELL_SIZE, py, WALL_SIZE, CELL_SIZE + WALL_SIZE, color)
 
 
     def _draw_menu(self):
@@ -90,7 +94,9 @@ class MazeWindow:
 
 
     def _on_key(self, keycode: int, param: Any) -> None:
-        if keycode == KEY_4:
+        if keycode == KEY_3:
+            self.color_index = (self.color_index + 1) % len(WALL_COLORS)
+        elif keycode == KEY_4:
             self._close_window(Any)
             return
         self.draw()
@@ -103,11 +109,13 @@ class MazeWindow:
 
     def draw(self) -> None:
             """Draw the whole maze based on each cell's wall bitmask."""
+            self.mlx.mlx_clear_window(self.mlx_ptr, self.win_ptr)
             for y in range(self.maze.height):
                 self._horizontal_walls(y, NORTH)
                 self._middle_line(y)
             self._horizontal_walls(self.maze.height -1, SOUTH)
             self._draw_menu()
+
 
     def run(self) -> None:
         self.draw()
