@@ -38,6 +38,7 @@ class MazeGenerator:
         self._reset_grid()
 
     def _reset_grid(self) -> None:
+        """Reset de maze grid with all the walls closed"""
         for y in range(self.height):
             row: List[int] = []
             for x in range(self.width):
