@@ -1,7 +1,7 @@
 from maze_generator import (MazeGenerator,
                             NORTH, WEST, EAST, SOUTH)
 from utils.colors import GREEN, WALL_COLORS
-from utils.keys_menu import MENU_TEXT, KEY_3, KEY_4
+from utils.keys_menu import MENU_TEXT, KEY_3, KEY_4, KEY_ESC_MAC, KEY_ESC_LINUX
 from mlx import Mlx
 from typing import Any, Tuple, Set, Dict
 
@@ -121,7 +121,7 @@ class MazeWindow:
     def _on_key(self, keycode: int, param: Any) -> None:
         if keycode == KEY_3:
             self.color_index = (self.color_index + 1) % len(WALL_COLORS)
-        elif keycode == KEY_4:
+        if keycode in (KEY_ESC_MAC, KEY_ESC_LINUX, KEY_4):
             self._close_window(Any)
             return
         self.draw()
