@@ -8,6 +8,14 @@ EAST: int = 2
 SOUTH: int = 4
 WEST: int = 8
 
+PATTERN_42 = [
+    [1, 0, 0,  0,  1, 1, 1],
+    [1, 0, 0,  0,  0, 0, 1],
+    [1, 1, 1,  0,  1, 1, 1],
+    [0, 0, 1,  0,  1, 0, 0],
+    [0, 0, 1,  0,  1, 1, 1],
+]
+
 
 class MazeGenerator:
     def __init__(
@@ -108,8 +116,29 @@ class MazeGenerator:
                 neighbors.append((new_x, new_y))
         return neighbors
 
+    def _get_42_cells(self) -> List[Tuple[int, int]]:
+        """Calculate real coordinates (x,y) on the grid corresponding to
+        the 42 pattern"""
+        pattern_h = len(PATTERN_42)
+        pattern_w = len(PATTERN_42[0])
+
+        if self.width < pattern_w + 2 or self.height < pattern_h + 2:
+            return []
+
+        start_x = (self.width - pattern_w) // 2
+        start_y = (self.height - pattern_h) // 2
+        cells_42 = []
+        for py in range(pattern_h):
+            for px in range(pattern_w):
+                if PATTERN_42[py][px] == 1:
+                    cells_42.append((start_x + px, start_y + py))
+        return cells_42
+
     def _is_dead_end(self, x: int, y: int) -> bool:
-        """Check if a cell is a dead-end (has 3 closed walls)."""
+        """Check if a cell is a dead-end (has 3 closed walls).
+        (Ignores the dead ends in the 42 pattern)"""
+        if (x, y) in set(self._get_42_cells()):
+            return False
         return bin(self.grid[y][x]).count("1") == 3
 
     def _is_wall_between_closed(self, x1: int, y1: int,
@@ -139,35 +168,49 @@ class MazeGenerator:
 
     def _open_corners_and_center(self) -> None:
         """Open corridors at the four corners and center for Pac-Man mode."""
-        corners_and_center = [
+        cells_42 = set(self._get_42_cells())
+        targets = [
             (0, 0),
             (self.width - 1, 0),
             (0, self.height - 1),
             (self.width - 1, self.height - 1),
-            (self.width // 2, self.height // 2),
         ]
-        for cx, cy in corners_and_center:
+        center = (self.width // 2, self.height // 2)
+
+        if center not in cells_42:
+            targets.append(center)
+
+        for cx, cy in targets:
             self._ensure_open_cell(cx, cy)
 
     def _eliminate_dead_ends(self) -> None:
-        """Eliminate dead-ends across the grid to build loops and
-        multi-route paths."""
+        """Eliminate dead-ends across the grid without breaking 
+       the 42 pattern."""
+        cells_42 = set(self._get_42_cells())
         while True:
-            dead_ends_found = 0
+            removed_any = False
             for y in range(self.height):
                 for x in range(self.width):
+                    if (x, y) in cells_42:
+                        continue
                     if self._is_dead_end(x, y):
-                        dead_ends_found += 1
-                        neighbors = self.get_neighbors(x, y)
-                        random.shuffle(neighbors)
-                        for nx, ny in neighbors:
+                        valid_neighbors = [
+                            (nx, ny)
+                            for nx, ny in self.get_neighbors(x, y)
+                            if (nx, ny) not in cells_42
+                        ]
+                        random.shuffle(valid_neighbors)
+
+                        for nx, ny in valid_neighbors:
                             if self._is_wall_between_closed(x, y, nx, ny):
                                 self.remove_wall_between(x, y, nx, ny)
-                                if not self._is_dead_end(x, y):
-                                    break
-            if dead_ends_found == 0:
+                                removed_any = True
+                                break
+            if not removed_any:
                 break
 
+
+    
     def generate(self) -> None:
         """Generate the maze cells and wall structures using DFS"""
         self._reset_grid()
@@ -177,9 +220,13 @@ class MazeGenerator:
 
         visited = [[False] * self.width for _ in range(self.height)]
 
+        cells_42 = set(self._get_42_cells())
+        for (cx, cy) in cells_42:
+            visited[cy][cx] = True
+            self.grid[cy][cx] = 15
+
         start_x, start_y = self.entry
         visited[start_y][start_x] = True
-
         stack = [(start_x, start_y)]
 
         while stack:
@@ -198,3 +245,4 @@ class MazeGenerator:
         if not self.perfect:
             self._open_corners_and_center()
             self._eliminate_dead_ends()
+
