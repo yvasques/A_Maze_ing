@@ -2,7 +2,7 @@ from maze_generator import (MazeGenerator,
                             NORTH, WEST, EAST, SOUTH)
 import utils.colors as colors
 import utils.keys_menu as keys
-from mlx import Mlx
+from mlx import Mlx  # type: ignore
 from typing import Any, Tuple, Set, Dict
 from config_parser import MazeConfig
 
@@ -152,7 +152,9 @@ class MazeWindow:
             self.color_index = (self.color_index + 1) % len(colors.WALL_COLORS)
 
         if keycode == keys.KEY_4:
-            self.color_42_index = (self.color_42_index + 1) % len(colors.WALL_COLORS)
+            self.color_42_index = (
+                (self.color_42_index + 1) % len(colors.WALL_COLORS)
+            )
         if keycode in (keys.KEY_ESC_MAC, keys.KEY_ESC_LINUX, keys.KEY_5):
             self._close_window(Any)
             return
@@ -182,7 +184,7 @@ class MazeWindow:
         for y in range(self.maze.height):
             self._horizontal_walls(y, NORTH)
             self._middle_line(y)
-        self._horizontal_walls(self.maze.height - 1, SOUTH)    
+        self._horizontal_walls(self.maze.height - 1, SOUTH)
         self._draw_menu()
 
     def run(self) -> None:

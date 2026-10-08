@@ -209,8 +209,6 @@ class MazeGenerator:
             if not removed_any:
                 break
 
-
-    
     def generate(self) -> None:
         """Generate the maze cells and wall structures using DFS"""
         self._reset_grid()
@@ -245,4 +243,3 @@ class MazeGenerator:
         if not self.perfect:
             self._open_corners_and_center()
             self._eliminate_dead_ends()
-

@@ -1,4 +1,3 @@
-from random import choice
 
 # Format 0xAARRGGBB (alpha FF = opaque)
 WHITE: int = 0xFFFFFFFF
@@ -20,4 +19,3 @@ WALL_COLORS: list[int] = [WHITE,
                           PURPLE,
                           YELLOW,
                           PINK]
-
