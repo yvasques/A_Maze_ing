@@ -3,7 +3,7 @@ from maze_generator import (MazeGenerator,
 import utils.colors as colors
 import utils.keys_menu as keys
 from mlx import Mlx
-from typing import Any, Tuple, Set, Dict
+from typing import Any, Tuple, Set, Dict, Callable
 from config_parser import MazeConfig
 
 CELL_SIZE: int = 32
@@ -23,7 +23,7 @@ class MazeWindow:
     """Window that draws a maze using the MiniLibX library."""
 
     def __init__(self, maze: MazeGenerator, path: str,
-                 config: MazeConfig) -> None:
+                 regenerate: Callable[[], Tuple[MazeGenerator, str]]) -> None:
         """Create the MLX window sized to fit the maze.
         Args:
             maze: The generated maze to display.
@@ -33,8 +33,8 @@ class MazeWindow:
         self.color_index: int = 2
         self.color_42_index: int = 6
         self.path: str = path
-        self.config: MazeConfig = config
         self.show_path: bool = False
+        self.regenerate: Callable[[], Tuple[MazeGenerator, str]] = regenerate
 
         calc_width: int = maze.width * CELL_SIZE + 2 * MARGIN
         calc_height: int = maze.height * CELL_SIZE + 2 * MARGIN
@@ -136,24 +136,21 @@ class MazeWindow:
 
     def _on_key(self, keycode: int, param: Any) -> None:
         if keycode == keys.KEY_1:
-            import random
-            from a_maze_ing import build_maze
-            random.seed()
-            self.maze, self.path = build_maze(self.config, seed=None)
-            self.draw()
-            return
-
-        if keycode == keys.KEY_2:
+            try:
+                self.maze, self.path = self.regenerate()
+            except(ValueError, OSError) as err:
+                print(f"Error: {err}")
+        elif keycode == keys.KEY_2:
             self.show_path = not self.show_path
             self.draw()
             return
 
-        if keycode == keys.KEY_3:
+        elif keycode == keys.KEY_3:
             self.color_index = (self.color_index + 1) % len(colors.WALL_COLORS)
 
-        if keycode == keys.KEY_4:
+        elif keycode == keys.KEY_4:
             self.color_42_index = (self.color_42_index + 1) % len(colors.WALL_COLORS)
-        if keycode in (keys.KEY_ESC_MAC, keys.KEY_ESC_LINUX, keys.KEY_5):
+        elif keycode in (keys.KEY_ESC_MAC, keys.KEY_ESC_LINUX, keys.KEY_5):
             self._close_window(Any)
             return
         self.draw()
@@ -182,10 +179,12 @@ class MazeWindow:
         for y in range(self.maze.height):
             self._horizontal_walls(y, NORTH)
             self._middle_line(y)
-        self._horizontal_walls(self.maze.height - 1, SOUTH)    
+        self._horizontal_walls(self.maze.height - 1, SOUTH)
         self._draw_menu()
 
     def run(self) -> None:
         self.draw()
+        self.mlx.mlx_expose_hook(self.win_ptr, lambda p: self.draw(), None)
         self.mlx.mlx_key_hook(self.win_ptr, self._on_key, None)
+        self.mlx.mlx_hook(self.win_ptr, 33, 0, self._close_window, None)
         self.mlx.mlx_loop(self.mlx_ptr)
