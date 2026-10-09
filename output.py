@@ -2,7 +2,6 @@
 
 from typing import List, Tuple
 
-
 def write_maze_file(
     filepath: str,
     grid: List[List[int]],
@@ -27,6 +26,7 @@ def write_maze_file(
             file.write(f"{hex_row}\n")
         file.write("\n")
 
-        file.write(f"{entry[0]}, {entry[1]}\n")
-        file.write(f"{exit_coords[0]}, {exit_coords[1]}\n")
+        file.write(f"{entry[0]}, {entry[1]} # entry (x,y)\n")
+        file.write(f"{exit_coords[0]}, {exit_coords[1]} # exit (x,y)\n")
         file.write(f"{shortest_path}\n")
+        file.write("user@42 ~/a_maze_ing$")
