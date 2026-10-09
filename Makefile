@@ -33,7 +33,7 @@ build:
 	rm -rf build *.egg-info
 
 clean:
-	rm -rf __pycache__ .mypy_cache .pytest_cache \
+	rm -rf __pycache__ utils/__pycache__ .mypy_cache .pytest_cache \
 	build dist *.egg-info $(VENV) $(MLX_DIR)
 
 lint:
