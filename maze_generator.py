@@ -47,11 +47,8 @@ class MazeGenerator:
 
     def _reset_grid(self) -> None:
         """Reset de maze grid with all the walls closed"""
-        for y in range(self.height):
-            row: List[int] = []
-            for x in range(self.width):
-                row.append(15)
-            self.grid.append(row)
+        self.grid = [[15] * self.width for _ in range(self.height)]
+
 
     def get_cell(self, x: int, y: int) -> int:
         """Get the wall bitmask value of a specific cell at (x, y)
@@ -184,7 +181,7 @@ class MazeGenerator:
             self._ensure_open_cell(cx, cy)
 
     def _eliminate_dead_ends(self) -> None:
-        """Eliminate dead-ends across the grid without breaking 
+        """Eliminate dead-ends across the grid without breaking
        the 42 pattern."""
         cells_42 = set(self._get_42_cells())
         while True:
@@ -210,7 +207,7 @@ class MazeGenerator:
                 break
 
 
-    
+
     def generate(self) -> None:
         """Generate the maze cells and wall structures using DFS"""
         self._reset_grid()
@@ -245,4 +242,3 @@ class MazeGenerator:
         if not self.perfect:
             self._open_corners_and_center()
             self._eliminate_dead_ends()
-
