@@ -44,6 +44,7 @@ class MazeGenerator:
         self.seed: Optional[int] = seed
         self.grid: List[List[int]] = []
         self._reset_grid()
+        self._rng = random.Random(seed)
 
     def _reset_grid(self) -> None:
         """Reset de maze grid with all the walls closed"""
@@ -195,7 +196,7 @@ class MazeGenerator:
                             for nx, ny in self.get_neighbors(x, y)
                             if (nx, ny) not in cells_42
                         ]
-                        random.shuffle(valid_neighbors)
+                        self._rng.shuffle(valid_neighbors)
 
                         for nx, ny in valid_neighbors:
                             if self._is_wall_between_closed(x, y, nx, ny):
@@ -208,9 +209,6 @@ class MazeGenerator:
     def generate(self) -> None:
         """Generate the maze cells and wall structures using DFS"""
         self._reset_grid()
-
-        if self.seed is not None:
-            random.seed(self.seed)
 
         visited = [[False] * self.width for _ in range(self.height)]
 
@@ -229,7 +227,7 @@ class MazeGenerator:
                         if not visited[un_y][un_x]]
 
             if unvisted:
-                un_x, un_y = random.choice(unvisted)
+                un_x, un_y = self._rng.choice(unvisted)
                 self.remove_wall_between(x, y, un_x, un_y)
                 visited[un_y][un_x] = True
                 stack.append((un_x, un_y))

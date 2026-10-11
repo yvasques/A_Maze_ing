@@ -109,7 +109,7 @@ def parse_config(path: str) -> MazeConfig:
 
     for name, (x, y) in (("ENTRY", entry), ("EXIT", exit)):
         if (x < 0 or y < 0):
-            raise ConfigError(f"{name} {x, y} must be greater than zero.")
+            raise ConfigError(f"{name} {x, y} must not be negative.")
         if not (0 <= x < width and 0 <= y < height):
             raise ConfigError(f"{name} {x, y} are out of bounds")
 
