@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by dneves-d and YANN*
+*This project has been created as part of the 42 curriculum by dneves-d, YANN*
 
 <h1 align="center">🎮  A-Maze-ing</h1>
 

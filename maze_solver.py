@@ -63,7 +63,7 @@ class MazeSolver:
                             parent[(nx, ny)] = ((curr_x, curr_y), step_char)
                             queue.append((nx, ny))
         if not found:
-         raise ValueError("No path between entry and exit")
+            raise ValueError("No path between entry and exit")
 
         path_chars: List[str] = []
         curr = self.exit_coords

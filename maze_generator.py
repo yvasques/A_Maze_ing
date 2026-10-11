@@ -49,7 +49,6 @@ class MazeGenerator:
         """Reset de maze grid with all the walls closed"""
         self.grid = [[15] * self.width for _ in range(self.height)]
 
-
     def get_cell(self, x: int, y: int) -> int:
         """Get the wall bitmask value of a specific cell at (x, y)
         Args:
@@ -205,8 +204,6 @@ class MazeGenerator:
                                 break
             if not removed_any:
                 break
-
-
 
     def generate(self) -> None:
         """Generate the maze cells and wall structures using DFS"""

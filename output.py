@@ -2,6 +2,7 @@
 
 from typing import List, Tuple
 
+
 def write_maze_file(
     filepath: str,
     grid: List[List[int]],

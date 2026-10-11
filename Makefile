@@ -39,7 +39,7 @@ clean:
 lint:
 	$(PYTHON_VENV) -m flake8 --exclude=$(VENV),$(MLX_DIR),build,dist .
 	$(PYTHON_VENV) -m mypy . \
-		--exclude '$(MLX_DIR)|build|dist' \
+		--exclude '$(VENV)|$(MLX_DIR)|build|dist' \
 		--warn-return-any \
 		--warn-unused-ignores \
 		--ignore-missing-imports \
