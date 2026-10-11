@@ -13,8 +13,12 @@
   <img src="https://img.shields.io/badge/Flake8-Passing-brightgreen?style=flat-square&logo=python" alt="Norm" />
 
 </p>
+<p align="center">
+   <img src="./utils/Maze.png">
+</p>
 
 ---
+
 ## 📋 Description
 
 A-Maze-ing is a maze-generation project for the 42 curriculum. The program reads maze settings from a plain-text configuration file, generates a maze, writes its wall structure and a shortest path to an output file, and provides a visual representation of the result.
@@ -54,11 +58,18 @@ make install
 ```Bash
 make run
 ```
-or
+
+Or to run it manually, activate the virtual environment first:
+
+```Bash
+source .venv/bin/activate
+python3 a_maze_ing.py config.txt
+```
+
+Then type:
 ```Bash
    python3 a_maze_ing.py config.txt
 ```
-
 
 ### Configuration file
 You can change the configuration values for the Maze generator.
@@ -187,21 +198,20 @@ print(path)                 # e.g. "SSEENNE..."
 
 ### Team roles
 
-| Team member | Role and responsibilities |
+| `Team member` | `Role and responsibilities` |
 | --- | --- |
-| `[TODO: login/name]` | `[TODO: actual responsibilities]` |
-| `[TODO: login/name]` | `[TODO: actual responsibilities]` |
-| `[TODO: login/name, if applicable]` | `[TODO: actual responsibilities]` |
+| dneves-d/Daniel | display, config parser, config.txt, LICENSE.md, resuable maze, utils, readme |
+| login/Yann | display, a_maze_ing, display, maze solver, output, readme, make file |
 
-Remove unused rows. For an individual project, state that clearly and describe the responsibilities handled by the author.
 
 ### Planning and retrospective
 
-- **Initial plan:** `[TODO: planned milestones and task allocation]`
-- **How the plan evolved:** `[TODO: changes made and why]`
-- **What worked well:** `[TODO: specific observations from the project]`
-- **What could be improved:** `[TODO: specific lessons or improvements]`
-- **Tools used:** `[TODO: actual development, collaboration, testing, and version-control tools]`
+- **Initial plan:**set up the inital structure. _First:_ step with config parser and maze generator. _Second:_ maze solver (BFS) and maze generator (DFS). _Third:_ display (ASCII). _Fourth:_ output and display (mlx). _Fifth:_ maze generator(perfect false), readme.
+- **How the plan evolved:** Each member took turns working on most of the files.
+- **What worked well:** The division of activities.
+- **What could be improved:** Version Control reducing
+conflict.
+- **Tools used:** GitHub, VSCode, Internet, AI and Systems: Linux and McOs.
 
 ## Resources
 
