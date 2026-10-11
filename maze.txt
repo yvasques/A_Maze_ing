@@ -1,0 +1,10 @@
+91553
+AC552
+A9392
+86C6A
+C5556
+
+0, 0 # entry (x,y)
+1, 1 # exit (x,y)
+ES
+user@42 ~/a_maze_ing$
