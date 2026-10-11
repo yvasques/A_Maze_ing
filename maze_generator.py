@@ -46,6 +46,14 @@ class MazeGenerator:
         self._reset_grid()
         self._rng = random.Random(seed)
 
+        if width < 1 or height < 1:
+            raise ValueError("width and height must be at least 1")
+        for name, (x, y) in (("entry", entry), ("exit", exit_coords)):
+            if not (0 <= x < width and 0 <= y < height):
+                raise ValueError(f"{name} {(x, y)} is out of bounds")
+        if entry == exit_coords:
+            raise ValueError("entry and exit must be different")
+
     def _reset_grid(self) -> None:
         """Reset de maze grid with all the walls closed"""
         self.grid = [[15] * self.width for _ in range(self.height)]
@@ -223,11 +231,12 @@ class MazeGenerator:
 
         while stack:
             x, y = stack[-1]
-            unvisted = [(un_x, un_y) for un_x, un_y in self.get_neighbors(x, y)
-                        if not visited[un_y][un_x]]
+            unvisited = [(un_x, un_y) for un_x, un_y
+                         in self.get_neighbors(x, y)
+                         if not visited[un_y][un_x]]
 
-            if unvisted:
-                un_x, un_y = self._rng.choice(unvisted)
+            if unvisited:
+                un_x, un_y = self._rng.choice(unvisited)
                 self.remove_wall_between(x, y, un_x, un_y)
                 visited[un_y][un_x] = True
                 stack.append((un_x, un_y))
