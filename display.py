@@ -39,7 +39,7 @@ class MazeWindow:
         self.path: str = path
         self.show_path: bool = False
         self.path_cells: list[Tuple[int, int]] = []
-        self.path_progress:int = 0
+        self.path_progress: int = 0
         self.last_path_animation_time: float = 0.0
         self.regenerate: Callable[[], Tuple[MazeGenerator, str]] = regenerate
 
@@ -115,16 +115,17 @@ class MazeWindow:
                             CELL_SIZE + WALL_SIZE, color)
 
     def _get_path_cells(self) -> list[Tuple[int, int]]:
-            """Return the path cells in the order they are visited for animation."""
-            x,y = self.maze.entry
-            cells:list[Tuple[int, int]] = [(x,y)]
+        """Return the path cells in the order they are
+        visited for animation."""
+        x, y = self.maze.entry
+        cells: list[Tuple[int, int]] = [(x, y)]
 
-            for step in self.path:
-                dx, dy = MOVES[step]
-                x += dx
-                y += dy
-                cells.append((x,y))
-            return cells
+        for step in self.path:
+            dx, dy = MOVES[step]
+            x += dx
+            y += dy
+            cells.append((x, y))
+        return cells
 
     def _draw_path(self) -> None:
         """Draw a small square in the center of each cell of the path."""
@@ -205,7 +206,6 @@ class MazeWindow:
         for (x, y) in cells_42:
             px, py = self._origin(x, y)
             self._draw_rect(px, py, CELL_SIZE, CELL_SIZE, color_42)
-
 
     def draw(self) -> None:
         """Draw the whole maze based on each cell's wall bitmask."""
