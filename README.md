@@ -149,24 +149,16 @@ the rest of the project (no MLX, no config parser):
 - `maze_generator.py`: the `MazeGenerator` class (maze generation).
 - `maze_solver.py`: the `MazeSolver` class (shortest path with BFS).
 
-### Build the package
+### Make a virtual enviroment and install mazegen.*whl:
 
-``` python
-make install
-make build
 ```
-This creates `mazegen-1.0.0-py3-none-any.whl` at the root of the
-repository.
-
-To rebuild it from scratch in a clean virtual environment:
-
-``` python
-python3 -m venv /tmp/build_env
-/tmp/build_env/bin/pip install build
-/tmp/build_env/bin/python -m build --wheel --outdir .
+python3 -m venv my_venv
+source my_venv/bin/activate
+pip install mazegen-1.0.0-py3-none-any.whl
 ```
 
 Creat a file: maze.py and type the code:
+
 ``` python
 from maze_generator import MazeGenerator
 from maze_solver import MazeSolver
@@ -183,16 +175,32 @@ maze = MazeGenerator(
 maze.generate()
 
 # Access the maze structure
-print(maze.grid[0][0])      # wall bitmask of the cell x=0, y=0
-print(maze.get_cell(3, 2))  # same thing, using a method
+print(maze.grid[0][0])
+print(maze.get_cell(3, 2))
 
 # Access the solution (shortest path from entry to exit)
 solver = MazeSolver(maze.grid, maze.width, maze.height,
                     maze.entry, maze.exit_coords)
 path = solver.solve()
-print(path)                 # e.g. "SSEENNE..."
-
+print(path)
 ```
+Run it with the virtual environment active:
+```
+python3 maze.py
+```
+
+### Parameters
+
+- `width`, `height`: maze size in cells (both at least 1).
+- `entry`, `exit_coords`: `(x, y)` coordinates, inside the maze and different from each other.
+- `perfect`: `True` for a single path between any two cells, `False` to allow loops.
+- `seed`: optional integer; the same seed always gives the same maze.
+
+### Rebuilding the package (developers only)
+
+After changing `maze_generator.py` or `maze_solver.py`, run `make build`
+and commit the new `.whl`.
+
 
 ## Team and project management
 
