@@ -33,7 +33,8 @@ def _read_raw_lines(path: Path) -> Dict[str, str]:
                     continue
 
                 if '=' not in stripped:
-                    raise ConfigError(f"Invalid syntax at line {line}")
+                    raise ConfigError(f"Invalid syntax at line "
+                                      f"{line_number}: '{line}'\n")
 
                 key, value = stripped.split("=", 1)
                 raw_dict[key.strip()] = value.strip()
@@ -62,7 +63,7 @@ def _parse_perfection(value: str) -> bool:
     elif value.strip().lower() in ("no", "0", "false"):
         return False
     else:
-        raise ConfigError(f"{value} is a invalid format for boolean")
+        raise ConfigError(f"{value} is an invalid format for boolean")
 
 
 def _perse_seed(value: str) -> int:
@@ -109,7 +110,7 @@ def parse_config(path: str) -> MazeConfig:
 
     for name, (x, y) in (("ENTRY", entry), ("EXIT", exit)):
         if (x < 0 or y < 0):
-            raise ConfigError(f"{name} {x, y} must be greater than zero.")
+            raise ConfigError(f"{name} {x, y} must not be negative.")
         if not (0 <= x < width and 0 <= y < height):
             raise ConfigError(f"{name} {x, y} are out of bounds")
 

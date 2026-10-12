@@ -4,7 +4,6 @@ from config_parser import parse_config, ConfigError, MazeConfig
 from maze_generator import MazeGenerator
 from maze_solver import MazeSolver
 from output import write_maze_file
-from display import MazeWindow
 
 
 def build_maze(config: MazeConfig,
@@ -48,24 +47,31 @@ def build_maze(config: MazeConfig,
 
 
 def main() -> None:
-    """Run the main maze generation flow"""
-    config_path = next((
-        arg for arg in sys.argv if arg.endswith(".txt")))
-    if config_path is None:
-        print("Usage: python3 a_maze_ing.py <config_file>")
+    """Run the main maze generation flow."""
+    if len(sys.argv) != 2:
+        print("Usage: python3 a_maze_ing.py <config_file>",
+              file=sys.stderr)
         sys.exit(1)
+
     try:
-        config = parse_config(config_path)
-        generator, path = build_maze(config, config.seed)
-    except ConfigError as err:
-        print(f"Error in configuration file: {err}")
+        from display import MazeWindow
+    except ImportError as err:
+        print(f"Error: MLX is not available ({err}). "
+              f"Run 'make install' and use 'make run'.",
+              file=sys.stderr)
         sys.exit(1)
 
-    print("Maze sucessfully generated and written to "
-          f"{config.output_file}")
-
-    window = MazeWindow(generator, path, config)
-    window.run()
+    try:
+        config = parse_config(sys.argv[1])
+        generator, path = build_maze(config, config.seed)
+        print("Maze successfully generated and written to "
+              f"{config.output_file}")
+        window = MazeWindow(generator, path,
+                            lambda: build_maze(config, None))
+        window.run()
+    except (ConfigError, ValueError, OSError) as err:
+        print(f"Error: {err}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

@@ -1,10 +1,11 @@
 from maze_generator import (MazeGenerator,
                             NORTH, WEST, EAST, SOUTH)
-import utils.colors as colors
-import utils.keys_menu as keys
-from mlx import Mlx  # type: ignore
-from typing import Any, Tuple, Set, Dict
-from config_parser import MazeConfig
+from utils.colors import WALL_COLORS, GREEN, RED
+from utils.keys_menu import (KEY_1, KEY_2, KEY_3, KEY_4,
+                             KEY_5, KEY_ESC_LINUX,
+                             KEY_ESC_MAC, MENU_TEXT)
+from mlx import Mlx
+from typing import Any, Tuple, Set, Dict, Callable
 
 CELL_SIZE: int = 32
 WALL_SIZE: int = 3
@@ -23,7 +24,7 @@ class MazeWindow:
     """Window that draws a maze using the MiniLibX library."""
 
     def __init__(self, maze: MazeGenerator, path: str,
-                 config: MazeConfig) -> None:
+                 regenerate: Callable[[], Tuple[MazeGenerator, str]]) -> None:
         """Create the MLX window sized to fit the maze.
         Args:
             maze: The generated maze to display.
@@ -33,8 +34,8 @@ class MazeWindow:
         self.color_index: int = 2
         self.color_42_index: int = 6
         self.path: str = path
-        self.config: MazeConfig = config
         self.show_path: bool = False
+        self.regenerate: Callable[[], Tuple[MazeGenerator, str]] = regenerate
 
         calc_width: int = maze.width * CELL_SIZE + 2 * MARGIN
         calc_height: int = maze.height * CELL_SIZE + 2 * MARGIN
@@ -46,7 +47,8 @@ class MazeWindow:
         maze_pixel_h: int = maze.height * CELL_SIZE
 
         self.offset_x: int = (self.win_width - maze_pixel_w) // 2
-        self.offset_y: int = ((self.win_height - MENU_HEIGHT) - maze_pixel_h) // 2
+        self.offset_y: int = (
+            (self.win_height - MENU_HEIGHT) - maze_pixel_h) // 2
 
         self.mlx: Any = Mlx()
         self.mlx_ptr: Any = self.mlx.mlx_init()
@@ -75,15 +77,15 @@ class MazeWindow:
 
         ex, ey = self.maze.entry
         px, py = self._origin(ex, ey)
-        self._draw_rect(px + padding, py + padding, size, size, colors.GREEN)
+        self._draw_rect(px + padding, py + padding, size, size, GREEN)
 
         sx, sy = self.maze.exit_coords
         px, py = self._origin(sx, sy)
-        self._draw_rect(px + padding, py + padding, size, size, colors.RED)
+        self._draw_rect(px + padding, py + padding, size, size, RED)
 
     def _horizontal_walls(self, y: int, wall: int) -> None:
         """Draw the horizontal walls (NORTH or SOUTH) of row y."""
-        color: int = colors.WALL_COLORS[self.color_index]
+        color: int = WALL_COLORS[self.color_index]
         offset: int = CELL_SIZE if wall == SOUTH else 0
         for x in range(self.maze.width):
             if self.maze.get_cell(x, y) & wall:
@@ -93,7 +95,7 @@ class MazeWindow:
 
     def _middle_line(self, y: int) -> None:
         """Build the line containing cell labels and vertical walls."""
-        color: int = colors.WALL_COLORS[self.color_index]
+        color: int = WALL_COLORS[self.color_index]
         for x in range(self.maze.width):
             if self.maze.get_cell(x, y) & WEST:
                 px, py = self._origin(x, y)
@@ -132,42 +134,38 @@ class MazeWindow:
         menu_x: int = MARGIN
 
         self.mlx.mlx_string_put(self.mlx_ptr, self.win_ptr, menu_x,
-                                menu_y, colors.GREEN, keys.MENU_TEXT)
+                                menu_y, GREEN, MENU_TEXT)
 
     def _on_key(self, keycode: int, param: Any) -> None:
-        if keycode == keys.KEY_1:
-            import random
-            from a_maze_ing import build_maze
-            random.seed()
-            self.maze, self.path = build_maze(self.config, seed=None)
-            self.draw()
-            return
-
-        if keycode == keys.KEY_2:
+        if keycode == KEY_1:
+            try:
+                self.maze, self.path = self.regenerate()
+            except (ValueError, OSError) as err:
+                print(f"Error: {err}")
+        elif keycode == KEY_2:
             self.show_path = not self.show_path
             self.draw()
             return
 
-        if keycode == keys.KEY_3:
-            self.color_index = (self.color_index + 1) % len(colors.WALL_COLORS)
+        elif keycode == KEY_3:
+            self.color_index = (self.color_index + 1) % len(WALL_COLORS)
 
-        if keycode == keys.KEY_4:
-            self.color_42_index = (
-                (self.color_42_index + 1) % len(colors.WALL_COLORS)
-            )
-        if keycode in (keys.KEY_ESC_MAC, keys.KEY_ESC_LINUX, keys.KEY_5):
+        elif keycode == KEY_4:
+            self.color_42_index = (self.color_42_index + 1) % len(
+                WALL_COLORS)
+        elif keycode in (KEY_ESC_MAC, KEY_ESC_LINUX, KEY_5):
             self._close_window(Any)
             return
         self.draw()
 
-    def _close_window(self, param: Any):
+    def _close_window(self, param: Any) -> None:
         """Stop the event loop when the window is closed."""
         self.mlx.mlx_loop_exit(self.mlx_ptr)
 
     def _draw_42_pattern(self) -> None:
         """Print 42 patterns cells on a stand-out colour"""
         cells_42 = self.maze._get_42_cells()
-        color_42 = colors.WALL_COLORS[self.color_42_index]
+        color_42 = WALL_COLORS[self.color_42_index]
         for (x, y) in cells_42:
             px, py = self._origin(x, y)
             self._draw_rect(px, py, CELL_SIZE, CELL_SIZE, color_42)
@@ -189,5 +187,7 @@ class MazeWindow:
 
     def run(self) -> None:
         self.draw()
+        self.mlx.mlx_expose_hook(self.win_ptr, lambda p: self.draw(), None)
         self.mlx.mlx_key_hook(self.win_ptr, self._on_key, None)
+        self.mlx.mlx_hook(self.win_ptr, 33, 0, self._close_window, None)
         self.mlx.mlx_loop(self.mlx_ptr)

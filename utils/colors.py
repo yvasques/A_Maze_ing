@@ -1,4 +1,3 @@
-
 # Format 0xAARRGGBB (alpha FF = opaque)
 WHITE: int = 0xFFFFFFFF
 RED: int = 0xFFE74C3C

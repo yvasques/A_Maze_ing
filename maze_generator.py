@@ -44,14 +44,19 @@ class MazeGenerator:
         self.seed: Optional[int] = seed
         self.grid: List[List[int]] = []
         self._reset_grid()
+        self._rng = random.Random(seed)
+
+        if width < 1 or height < 1:
+            raise ValueError("width and height must be at least 1")
+        for name, (x, y) in (("entry", entry), ("exit", exit_coords)):
+            if not (0 <= x < width and 0 <= y < height):
+                raise ValueError(f"{name} {(x, y)} is out of bounds")
+        if entry == exit_coords:
+            raise ValueError("entry and exit must be different")
 
     def _reset_grid(self) -> None:
         """Reset de maze grid with all the walls closed"""
-        for y in range(self.height):
-            row: List[int] = []
-            for x in range(self.width):
-                row.append(15)
-            self.grid.append(row)
+        self.grid = [[15] * self.width for _ in range(self.height)]
 
     def get_cell(self, x: int, y: int) -> int:
         """Get the wall bitmask value of a specific cell at (x, y)
@@ -184,7 +189,7 @@ class MazeGenerator:
             self._ensure_open_cell(cx, cy)
 
     def _eliminate_dead_ends(self) -> None:
-        """Eliminate dead-ends across the grid without breaking 
+        """Eliminate dead-ends across the grid without breaking
        the 42 pattern."""
         cells_42 = set(self._get_42_cells())
         while True:
@@ -199,7 +204,7 @@ class MazeGenerator:
                             for nx, ny in self.get_neighbors(x, y)
                             if (nx, ny) not in cells_42
                         ]
-                        random.shuffle(valid_neighbors)
+                        self._rng.shuffle(valid_neighbors)
 
                         for nx, ny in valid_neighbors:
                             if self._is_wall_between_closed(x, y, nx, ny):
@@ -212,9 +217,6 @@ class MazeGenerator:
     def generate(self) -> None:
         """Generate the maze cells and wall structures using DFS"""
         self._reset_grid()
-
-        if self.seed is not None:
-            random.seed(self.seed)
 
         visited = [[False] * self.width for _ in range(self.height)]
 
@@ -229,11 +231,12 @@ class MazeGenerator:
 
         while stack:
             x, y = stack[-1]
-            unvisted = [(un_x, un_y) for un_x, un_y in self.get_neighbors(x, y)
-                        if not visited[un_y][un_x]]
+            unvisited = [(un_x, un_y) for un_x, un_y
+                         in self.get_neighbors(x, y)
+                         if not visited[un_y][un_x]]
 
-            if unvisted:
-                un_x, un_y = random.choice(unvisted)
+            if unvisited:
+                un_x, un_y = self._rng.choice(unvisited)
                 self.remove_wall_between(x, y, un_x, un_y)
                 visited[un_y][un_x] = True
                 stack.append((un_x, un_y))
