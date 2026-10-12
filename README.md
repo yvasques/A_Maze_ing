@@ -43,18 +43,12 @@ The required implementation is written in Python 3.10 or later. It must support 
    cd a_maze_ing
 ```
 
-2. **Set up a virtual environment and activate it:**
-```Bash
-   python3 -m venv venv
-   source venv/bin/activate  # Linux/macOS
-```
-
-3. **Install dependencies:**
+2. **Install dependencies:**
 ```Bash
 make install
 ```
 
-4. **Run the program with make**
+3. **Run the program with make**
 ```Bash
 make run
 ```
@@ -62,7 +56,7 @@ make run
 Or to run it manually, activate the virtual environment first:
 
 ```Bash
-source .venv/bin/activate
+source .venv/bin/activate # Linux/macOS
 python3 a_maze_ing.py config.txt
 ```
 
