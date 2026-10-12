@@ -5,7 +5,9 @@ from utils.keys_menu import (KEY_1, KEY_2, KEY_3, KEY_4,
                              KEY_5, KEY_ESC_LINUX,
                              KEY_ESC_MAC, MENU_TEXT)
 from mlx import Mlx
-from typing import Any, Tuple, Set, Dict, Callable
+from typing import Any, Tuple, Dict, Callable
+import time
+
 
 CELL_SIZE: int = 32
 WALL_SIZE: int = 3
@@ -13,6 +15,7 @@ MARGIN: int = 20
 MIN_WIN_WIDTH: int = 700
 MIN_WIN_HEIGHT: int = 700
 MENU_HEIGHT: int = 40
+PATH_ANIMATION_INTERVAL: float = 0.08
 
 MOVES: Dict[str, Tuple[int, int]] = {"N": (0, -1),
                                      "E": (1, 0),
@@ -35,6 +38,9 @@ class MazeWindow:
         self.color_42_index: int = 6
         self.path: str = path
         self.show_path: bool = False
+        self.path_cells: list[Tuple[int, int]] = []
+        self.path_progress:int = 0
+        self.last_path_animation_time: float = 0.0
         self.regenerate: Callable[[], Tuple[MazeGenerator, str]] = regenerate
 
         calc_width: int = maze.width * CELL_SIZE + 2 * MARGIN
@@ -108,25 +114,49 @@ class MazeWindow:
             self._draw_rect(px + CELL_SIZE, py, WALL_SIZE,
                             CELL_SIZE + WALL_SIZE, color)
 
-    def _draw_path_cells(self) -> Set[Tuple[int, int]]:
-        """Convert the path string into the set of cells it crosses."""
-        (x, y) = self.maze.entry
-        cells: Set[Tuple[int, int]] = {(x, y)}
-        for step in self.path:
-            px, py = MOVES[step]
-            x, y = px + x, py + y
-            cells.add((x, y))
-        return cells
+    def _get_path_cells(self) -> list[Tuple[int, int]]:
+            """Return the path cells in the order they are visited for animation."""
+            x,y = self.maze.entry
+            cells:list[Tuple[int, int]] = [(x,y)]
+
+            for step in self.path:
+                dx, dy = MOVES[step]
+                x += dx
+                y += dy
+                cells.append((x,y))
+            return cells
 
     def _draw_path(self) -> None:
         """Draw a small square in the center of each cell of the path."""
         size: int = CELL_SIZE // 3
         offset: int = (CELL_SIZE - size) // 2
-        for (x, y) in self._draw_path_cells():
+
+        for (x, y) in self.path_cells[:self.path_progress]:
             if (x, y) == self.maze.entry or (x, y) == self.maze.exit_coords:
                 continue
+
             px, py = self._origin(x, y)
             self._draw_rect(px + offset, py + offset, size, size, 0xFFFFD700)
+
+    def _animate_path(self, param: Any) -> None:
+        """Reveal one more path cell at a fixed time interval."""
+        if not self.show_path:
+            return
+
+        now: float = time.monotonic()
+        if now - self.last_path_animation_time < PATH_ANIMATION_INTERVAL:
+            return
+
+        self.last_path_animation_time = now
+
+        if self.path_progress < len(self.path_cells):
+            self.path_progress += 1
+            self.draw()
+
+    def _restart_animation_path(self) -> None:
+        self.path_cells = self._get_path_cells()
+        self.path_progress = 0
+        self.last_path_animation_time = time.monotonic()
 
     def _draw_menu(self) -> None:
         """Write the menu text below the maze."""
@@ -140,10 +170,16 @@ class MazeWindow:
         if keycode == KEY_1:
             try:
                 self.maze, self.path = self.regenerate()
+                self._restart_animation_path()
             except (ValueError, OSError) as err:
                 print(f"Error: {err}")
+
         elif keycode == KEY_2:
             self.show_path = not self.show_path
+            if self.show_path:
+                self._restart_animation_path()
+            else:
+                self.path_progress = 0
             self.draw()
             return
 
@@ -170,6 +206,7 @@ class MazeWindow:
             px, py = self._origin(x, y)
             self._draw_rect(px, py, CELL_SIZE, CELL_SIZE, color_42)
 
+
     def draw(self) -> None:
         """Draw the whole maze based on each cell's wall bitmask."""
         self.mlx.mlx_clear_window(self.mlx_ptr, self.win_ptr)
@@ -186,8 +223,10 @@ class MazeWindow:
         self._draw_menu()
 
     def run(self) -> None:
+        """Run the maze"""
         self.draw()
         self.mlx.mlx_expose_hook(self.win_ptr, lambda p: self.draw(), None)
         self.mlx.mlx_key_hook(self.win_ptr, self._on_key, None)
         self.mlx.mlx_hook(self.win_ptr, 33, 0, self._close_window, None)
+        self.mlx.mlx_loop_hook(self.mlx_ptr, self._animate_path, None)
         self.mlx.mlx_loop(self.mlx_ptr)
