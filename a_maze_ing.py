@@ -7,7 +7,8 @@ from output import write_maze_file
 from display import MazeWindow
 
 
-def build_maze(config: MazeConfig, seed: Optional[int]) -> Tuple[MazeGenerator, str]:
+def build_maze(config: MazeConfig,
+               seed: Optional[int]) -> Tuple[MazeGenerator, str]:
     """Generate a maze, solve it and write it to the output file.
     Args:
         config: The validated configuration.
@@ -22,7 +23,7 @@ def build_maze(config: MazeConfig, seed: Optional[int]) -> Tuple[MazeGenerator, 
         entry=config.entry,
         exit_coords=config.exit,
         perfect=config.perfect,
-        seed=config.seed,
+        seed=seed,
     )
     generator.generate()
 
@@ -45,6 +46,7 @@ def build_maze(config: MazeConfig, seed: Optional[int]) -> Tuple[MazeGenerator, 
 
     return generator, shortest_path
 
+
 def main() -> None:
     """Run the main maze generation flow"""
     config_path = next((
@@ -59,12 +61,12 @@ def main() -> None:
         print(f"Error in configuration file: {err}")
         sys.exit(1)
 
-
     print("Maze sucessfully generated and written to "
           f"{config.output_file}")
 
-    window = MazeWindow(generator, path)
+    window = MazeWindow(generator, path, config)
     window.run()
+
 
 if __name__ == "__main__":
     main()
