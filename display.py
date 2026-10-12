@@ -171,6 +171,7 @@ class MazeWindow:
         if keycode == KEY_1:
             try:
                 self.maze, self.path = self.regenerate()
+                self.show_path = False
                 self._restart_animation_path()
             except (ValueError, OSError) as err:
                 print(f"Error: {err}")
