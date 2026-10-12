@@ -34,7 +34,7 @@ def _read_raw_lines(path: Path) -> Dict[str, str]:
 
                 if '=' not in stripped:
                     raise ConfigError(f"Invalid syntax at line "
-                                      f"{line_number}: '{line}'")
+                                      f"{line_number}: '{line}'\n")
 
                 key, value = stripped.split("=", 1)
                 raw_dict[key.strip()] = value.strip()
