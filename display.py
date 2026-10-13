@@ -155,6 +155,7 @@ class MazeWindow:
             self.draw()
 
     def _restart_animation_path(self) -> None:
+        """Clear the path progress to restart the animation"""
         self.path_cells = self._get_path_cells()
         self.path_progress = 0
         self.last_path_animation_time = time.monotonic()
@@ -168,6 +169,7 @@ class MazeWindow:
                                 menu_y, GREEN, MENU_TEXT)
 
     def _on_key(self, keycode: int, param: Any) -> None:
+        """Handle menu key choices"""
         if keycode == KEY_1:
             try:
                 self.maze, self.path = self.regenerate()
