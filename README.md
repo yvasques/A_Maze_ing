@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by dneves-d, YANN*
+*This project has been created as part of the 42 curriculum by dneves-d, yvasques*
 
 <h1 align="center">🎮  A-Maze-ing</h1>
 
@@ -148,10 +148,12 @@ the rest of the project (no MLX, no config parser):
 ```
 python3 -m venv my_venv
 source my_venv/bin/activate
-pip install mazegen-1.0.0-py3-none-any.whl
+python -m pip install mazegen-1.0.0-py3-none-any.whl
+make install
+make run
 ```
 
-Creat a file: maze.py and type the code:
+An example of the a_maze_ing.py
 
 ``` python
 from maze_generator import MazeGenerator
@@ -178,10 +180,7 @@ solver = MazeSolver(maze.grid, maze.width, maze.height,
 path = solver.solve()
 print(path)
 ```
-Run it with the virtual environment active:
-```
-python3 maze.py
-```
+
 
 ### Parameters
 
@@ -203,7 +202,7 @@ and commit the new `.whl`.
 | `Team member` | `Role and responsibilities` |
 | --- | --- |
 | dneves-d/Daniel | display, config parser, config.txt, LICENSE.md, resuable maze, utils, readme |
-| login/Yann | display, a_maze_ing, display, maze solver, output, readme, make file |
+| yvasques/Yann | display, a_maze_ing, display, maze solver, output, readme, make file |
 
 
 ### Planning and retrospective
