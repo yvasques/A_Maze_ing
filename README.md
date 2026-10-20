@@ -3,11 +3,6 @@
 <h1 align="center">🎮  A-Maze-ing</h1>
 
 <p align="center">
-  <b>The foundational framework of the 42 curriculum.</b><br>
-  An implementation of a custom C library replicating standard system behaviors and dynamic data structures.
-</p>
-
-<p align="center">
   <img src="https://img.shields.io/badge/-Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Language" />
   <img src="https://img.shields.io/badge/Build-Makefile-9cc2e5?style=flat-square&logo=gnu&logoColor=black" alt="Build" />
   <img src="https://img.shields.io/badge/Flake8-Passing-brightgreen?style=flat-square&logo=python" alt="Norm" />
